@@ -2,8 +2,9 @@ import sys
 import os
 from PyQt5.QtWidgets import (
     QWidget, QPushButton, QLabel, QVBoxLayout,
-    QApplication, QLineEdit, QFileDialog
+    QApplication, QLineEdit, QFileDialog, QSpacerItem, QSizePolicy, QHBoxLayout
 )
+from PyQt5.QtGui import QFont
 from rembg import remove
 from PIL import Image
 import io
@@ -39,51 +40,74 @@ def remover_fundo():
         caminho_saida = os.path.join(os.path.dirname(caminho_imagem), nome_saida)
 
         imagem_pronta.save(caminho_saida)
-        texto_status.setText(f"Fundo removido com sucesso. Imagem salva em: {caminho_saida}")
+        texto_status.setText(f"Fundo removido com sucesso.\nImagem salva em: {caminho_saida}")
 
     except Exception as erro:
-        texto_status.setText(f"Erro ao remover fundo: {str(erro)}")
+        texto_status.setText(f"Erro ao remover fundo:\n{str(erro)}")
 
 aplicativo = QApplication(sys.argv)
 janela = QWidget()
 janela.setWindowTitle('Removedor de Fundo de Imagens')
-janela.setGeometry(250, 250, 600, 300)
+janela.setGeometry(250, 250, 600, 350)
+
 
 estilo_css = """
     QWidget {
-        background-color: #f4f4f4;
-        font-family: Arial;
+        background-color: #ffffff;
+        font-family: "Segoe UI", Arial, sans-serif;
         font-size: 14px;
-        color: #222;
+        color: #333;
     }
 
     QLabel {
-        margin-bottom: 10px;
+        margin-bottom: 6px;
+        font-weight: 500;
     }
 
     QLineEdit {
-        padding: 8px;
+        padding: 10px;
         border: 1px solid #bbb;
-        border-radius: 6px;
+        border-radius: 8px;
+        background-color: #f7f7f7;
+    }
+
+    QLineEdit:focus {
+        border: 1px solid #444;
+        background-color: #ffffff;
     }
 
     QPushButton {
-        background-color: #0066cc;
-        color: #fff;
+        background-color: #2c3e50;
+        color: white;
         border: none;
-        padding: 10px;
-        border-radius: 6px;
-        font-weight: bold;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
     }
 
     QPushButton:hover {
-        background-color: #004c99;
+        background-color: #1a252f;
+    }
+
+    QPushButton:pressed {
+        background-color: #121a21;
+    }
+
+    QPushButton:disabled {
+        background-color: #cccccc;
+        color: #666666;
     }
 """
 
 aplicativo.setStyleSheet(estilo_css)
 
-texto_descricao = QLabel("Este programa permite selecionar uma imagem e remover o fundo automaticamente.")
+
+logo = QLabel("Codeline")
+logo.setFont(QFont("Segoe UI", 24, QFont.Bold))
+logo.setStyleSheet("color: #2c3e50; margin-bottom: 20px;")
+
+texto_descricao = QLabel("Selecione uma imagem do seu computador para remover o fundo automaticamente.")
 texto_status = QLabel("Pronto para iniciar.")
 campo_caminho = QLineEdit()
 campo_caminho.setPlaceholderText("Caminho da imagem selecionada...")
@@ -94,12 +118,19 @@ botao_buscar.clicked.connect(selecionar_imagem)
 botao_remover = QPushButton('Remover Fundo')
 botao_remover.clicked.connect(remover_fundo)
 
+rodape = QLabel("© 2025 Codeline. Todos os direitos reservados.")
+rodape.setStyleSheet("font-size: 12px; color: #888; margin-top: 20px;")
+
 layout = QVBoxLayout()
+layout.setSpacing(12)
+layout.addWidget(logo)
 layout.addWidget(texto_descricao)
-layout.addWidget(texto_status)
 layout.addWidget(campo_caminho)
 layout.addWidget(botao_buscar)
 layout.addWidget(botao_remover)
+layout.addWidget(texto_status)
+layout.addSpacerItem(QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
+layout.addWidget(rodape)
 
 janela.setLayout(layout)
 janela.show()
