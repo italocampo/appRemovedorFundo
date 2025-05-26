@@ -4,7 +4,8 @@ from PyQt5.QtWidgets import (
     QWidget, QPushButton, QLabel, QVBoxLayout,
     QApplication, QLineEdit, QFileDialog, QSpacerItem, QSizePolicy, QHBoxLayout
 )
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QPixmap, QPainter, QPainterPath
+from PyQt5.QtCore import Qt
 from rembg import remove
 from PIL import Image
 import io
@@ -45,12 +46,27 @@ def remover_fundo():
     except Exception as erro:
         texto_status.setText(f"Erro ao remover fundo:\n{str(erro)}")
 
+def criar_logo_arredondada(caminho_imagem, tamanho=60):
+    pixmap_original = QPixmap(caminho_imagem).scaled(tamanho, tamanho, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+    mask = QPixmap(tamanho, tamanho)
+    mask.fill(Qt.transparent)
+
+    painter = QPainter(mask)
+    painter.setRenderHint(QPainter.Antialiasing)
+    path = QPainterPath()
+    path.addEllipse(0, 0, tamanho, tamanho)
+    painter.setClipPath(path)
+    painter.drawPixmap(0, 0, pixmap_original)
+    painter.end()
+
+    return mask
+
 aplicativo = QApplication(sys.argv)
 janela = QWidget()
 janela.setWindowTitle('Removedor de Fundo de Imagens')
 janela.setGeometry(250, 250, 600, 350)
 
-
+# Estilo visual
 estilo_css = """
     QWidget {
         background-color: #ffffff;
@@ -99,14 +115,27 @@ estilo_css = """
         color: #666666;
     }
 """
-
 aplicativo.setStyleSheet(estilo_css)
 
+# Logo com nome (usando imagem imgCodeLine.jpg)
+caminho_logo = "imgCodeLine.jpg"  # sua imagem da logo
+logo_pixmap = criar_logo_arredondada(caminho_logo, tamanho=60)
 
-logo = QLabel("Codeline")
-logo.setFont(QFont("Segoe UI", 24, QFont.Bold))
-logo.setStyleSheet("color: #2c3e50; margin-bottom: 20px;")
+logo_label = QLabel()
+logo_label.setPixmap(logo_pixmap)
+logo_label.setFixedSize(60, 60)
 
+texto_logo = QLabel("Codeline")
+texto_logo.setFont(QFont("Segoe UI", 20, QFont.Bold))
+texto_logo.setStyleSheet("color: #2c3e50; margin-left: 10px;")
+
+logo_layout = QHBoxLayout()
+logo_layout.addStretch()
+logo_layout.addWidget(logo_label)
+logo_layout.addWidget(texto_logo)
+logo_layout.addStretch()
+
+# Outros elementos da interface
 texto_descricao = QLabel("Selecione uma imagem do seu computador para remover o fundo automaticamente.")
 texto_status = QLabel("Pronto para iniciar.")
 campo_caminho = QLineEdit()
@@ -121,9 +150,10 @@ botao_remover.clicked.connect(remover_fundo)
 rodape = QLabel("© 2025 Codeline. Todos os direitos reservados.")
 rodape.setStyleSheet("font-size: 12px; color: #888; margin-top: 20px;")
 
+# Layout principal
 layout = QVBoxLayout()
 layout.setSpacing(12)
-layout.addWidget(logo)
+layout.addLayout(logo_layout)
 layout.addWidget(texto_descricao)
 layout.addWidget(campo_caminho)
 layout.addWidget(botao_buscar)
