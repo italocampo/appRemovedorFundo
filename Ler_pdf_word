@@ -1,0 +1,20 @@
+import docx
+from PyPDF2 import PdfReader
+
+def ler_word(caminho_arquivo=r"C:\Users\Windows OS\OneDrive\Área de Trabalho\Faculdade\3° sem ADS\Phyton3\Phyton\conteudo\Word.docx"):
+    doc = docx.Document(caminho_arquivo)
+    texto = "\n".join([paragrafo.text for paragrafo in doc.paragraphs])
+    return texto
+
+def ler_pdf(caminho_pdf=r"C:\Users\Windows OS\OneDrive\Área de Trabalho\Faculdade\3° sem ADS\Phyton3\Phyton\conteudo\PDF.pdf"):
+    leitor = PdfReader(caminho_pdf)
+    texto = "\n".join([pagina.extract_text() for pagina in leitor.pages if pagina.extract_text()])
+    return texto
+
+# Chamando as funções corretamente
+texto_word = ler_word()
+texto_pdf = ler_pdf()
+
+# Exibir os resultados
+print("Texto do Word:", texto_word)
+print("Texto do PDF:", texto_pdf)
